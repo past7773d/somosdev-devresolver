@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Users Collection (PII isolated, owners only)
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+                    isValidId(userId) &&
+                    incoming().id == userId &&
+                    incoming().displayName is string && incoming().displayName.size() <= 100 &&
+                    incoming().email is string && incoming().email.size() <= 200;
+      allow update: if isOwner(userId) &&
+                    incoming().id == existing().id &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']);
+    }
+
+    // Developer Diagnostics Collection
+    match /diagnostics/{diagnosticId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() &&
+                    isValidId(diagnosticId) &&
+                    incoming().userId == request.auth.uid &&
+                    incoming().title is string && incoming().title.size() <= 200 &&
+                    incoming().toolType in ['appsheet_pdf', 'dataplex_catalog', 'model_garden'];
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Google Arcade Proposals Collection (Community shared)
+    match /arcade_proposals/{proposalId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() &&
+                    isValidId(proposalId) &&
+                    incoming().userId == request.auth.uid &&
+                    incoming().title is string && incoming().title.size() <= 200 &&
+                    incoming().authorName is string && incoming().authorName.size() <= 100 &&
+                    incoming().description is string && incoming().description.size() <= 3000 &&
+                    incoming().targetTier in ['Champion', 'Legend', 'All'] &&
+                    incoming().status == 'proposed' &&
+                    incoming().voteCount == 0;
+      allow update: if isSignedIn() &&
+                    isValidId(proposalId) && (
+                      (incoming().userId == existing().userId && 
+                       existing().userId == request.auth.uid && 
+                       incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'targetTier'])) ||
+                      (incoming().diff(existing()).affectedKeys().hasOnly(['voteCount']) &&
+                       (incoming().voteCount == existing().voteCount + 1 || incoming().voteCount == existing().voteCount - 1))
+                    );
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Google Arcade Votes Collection
+    match /arcade_votes/{voteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() &&
+                    isValidId(voteId) &&
+                    incoming().userId == request.auth.uid &&
+                    incoming().proposalId is string && incoming().proposalId.size() <= 128;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

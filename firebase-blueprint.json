@@ -1,0 +1,81 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "displayName", "email", "createdAt"]
+    },
+    "Diagnostic": {
+      "title": "Diagnostic",
+      "description": "Developer diagnostic and resolution record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "toolType": { "type": "string", "enum": ["appsheet_pdf", "dataplex_catalog", "model_garden"] },
+        "title": { "type": "string", "maxLength": 200 },
+        "inputSummary": { "type": "string", "maxLength": 1000 },
+        "resultSummary": { "type": "string", "maxLength": 2000 },
+        "sanitizedCode": { "type": "string", "maxLength": 50000 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "toolType", "title", "createdAt"]
+    },
+    "ArcadeProposal": {
+      "title": "ArcadeProposal",
+      "description": "Community proposal for Google Arcade reward resolutions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "authorName": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "targetTier": { "type": "string", "enum": ["Champion", "Legend", "All"] },
+        "description": { "type": "string", "maxLength": 3000 },
+        "estimatedEffortPoints": { "type": "number" },
+        "voteCount": { "type": "number" },
+        "status": { "type": "string", "enum": ["proposed", "under_review", "validated"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "authorName", "title", "targetTier", "description", "voteCount", "status", "createdAt"]
+    },
+    "ArcadeVote": {
+      "title": "ArcadeVote",
+      "description": "Individual vote on an Arcade proposal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "proposalId": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "proposalId", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profile records"
+    },
+    "/diagnostics/{diagnosticId}": {
+      "schema": "Diagnostic",
+      "description": "Developer diagnostic logs and generated templates"
+    },
+    "/arcade_proposals/{proposalId}": {
+      "schema": "ArcadeProposal",
+      "description": "Community proposals for Arcade reward resolutions"
+    },
+    "/arcade_votes/{voteId}": {
+      "schema": "ArcadeVote",
+      "description": "Votes cast on Arcade proposals"
+    }
+  }
+}

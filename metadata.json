@@ -1,0 +1,6 @@
+{
+  "name": "SOMOSDEV DevResolver",
+  "description": "Plataforma de engenharia e resolução para a comunidade Google Developer: diagnóstico e sanitização de imagens para PDF do AppSheet, governança Dataplex, Model Garden e governança de recompensas do Arcade.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

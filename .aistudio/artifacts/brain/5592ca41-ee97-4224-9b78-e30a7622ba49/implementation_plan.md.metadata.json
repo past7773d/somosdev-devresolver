@@ -1,0 +1,6 @@
+{
+  "summary": "Plano de implementação da plataforma SOMOSDEV DevResolver para solucionar os problemas críticos levantados na comunidade do Google Developer (AppSheet PDF Image Error, Governança de Metadados Dataplex/Knowledge Catalog, Model Garden DeepSeek e Central de Resolução do Google Arcade), com autenticação Google e persistência Firestore.",
+  "updatedAt": "2026-10-18T23:30:43.707156899Z",
+  "requestFeedback": true,
+  "userFacing": true
+}
