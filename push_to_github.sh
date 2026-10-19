@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Pastana Dynamics — Script de Envio ao GitHub
 # Autor: pastana7773d@gmail.com
+# Repositório Oficial: https://github.com/past7773d/somosdev-devresolver
 
 set -e
 
@@ -8,13 +9,13 @@ TOKEN="$1"
 
 if [ -z "$TOKEN" ]; then
   echo "Uso: ./push_to_github.sh SEU_GITHUB_PERSONAL_ACCESS_TOKEN"
-  echo "Ou configure via SSH / git push origin main"
+  echo "Exemplo: ./push_to_github.sh ghp_xxxxxxxxxxxxxxxxxxxx"
   exit 1
 fi
 
-REPO_URL="https://pastana7773d:${TOKEN}@github.com/pastana7773d/somosdev-devresolver.git"
+REPO_URL="https://past7773d:${TOKEN}@github.com/past7773d/somosdev-devresolver.git"
 
-echo "Configurando remote autenticado..."
+echo "Configurando remote autenticado para past7773d..."
 git remote set-url origin "$REPO_URL"
 
 echo "Enviando branch main para o GitHub..."
